@@ -1,4 +1,4 @@
-flags=-g3 -Wall -ansi -pedantic
+flags=-g3 -Wall -ansi -pedantic -D_GNU_SOURCE
 
 all: icmptx
 

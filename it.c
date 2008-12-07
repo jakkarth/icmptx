@@ -23,11 +23,6 @@
 
 #include "tun_dev.h"
 
-/*
- * FIXME this seems really screwed up. This stuff is supposed to be in the files I'm including above.
- */
-void herror(const char *s);
-
 struct icmp {
   u_int8_t	type;
   u_int8_t	code;
@@ -85,7 +80,7 @@ int icmp_tunnel(int sock, int proxy, struct sockaddr_in *target, int tun_fd, int
 
     select (tun_fd>sock?tun_fd+1:sock+1, &fs, NULL, NULL, NULL);
 
-    /* data available on tunnel device */
+    /* data available on tunnel device, need to transmit over icmp */
     if (FD_ISSET (tun_fd, &fs)) {
       result = tun_read (tun_fd, packet+len, packetsize);
       if (!result) {
@@ -107,7 +102,7 @@ int icmp_tunnel(int sock, int proxy, struct sockaddr_in *target, int tun_fd, int
       }
     }
 
-    /* data available on socket */
+    /* data available on socket from icmp, need to pass along to tunnel device */
     if (FD_ISSET(sock, &fs)) {
       fromlen = sizeof (struct sockaddr_in);
       num = recvfrom(sock, packet, len+packetsize, 0, (struct sockaddr*)&from, (socklen_t*) &fromlen);
@@ -134,22 +129,25 @@ int icmp_tunnel(int sock, int proxy, struct sockaddr_in *target, int tun_fd, int
  */
 int run_icmp_tunnel (int id, int packetsize, char **argv, int tun_fd) {
   struct sockaddr_in target;
+  struct in_addr inp;
   int s;
   char *daemon = argv[1];
   char *desthost = argv[2];
 
-  if (!desthost) { /*this doesn't make sense for server mode, does it?*/
+  if (!desthost) { /*this doesn't make sense for server mode, does it? maybe I need it to know which interface to monitor/transmit on*/
     fprintf (stderr, "no destination\n");
     return -1;
   }
 
-  if ((target.sin_addr.s_addr = inet_addr (desthost)) == -1) {
+  if (!inet_aton(desthost, &inp)) {
     struct hostent* he;
     if (!(he = gethostbyname (desthost))) {
       herror ("gethostbyname");
       return -1;
     }
     memcpy (&target.sin_addr.s_addr, he->h_addr_list[0], he->h_length);
+  } else {
+    target.sin_addr.s_addr = inp.s_addr;
   }
   target.sin_family = AF_INET;
 
