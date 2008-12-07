@@ -11,7 +11,7 @@ it.o: it.c driver.h
 icmptx.o: icmptx.c driver.h
 	gcc $(flags) -c icmptx.c
 
-tun_dev.o: tun_dev.c vtun.h llist.h
+tun_dev.o: tun_dev.c
 	gcc $(flags) -c tun_dev.c
 
 clean:
