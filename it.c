@@ -60,6 +60,8 @@ int icmp_tunnel(int sock, int proxy, struct sockaddr_in *target, int tun_fd, int
   int len;
   int result;
   fd_set fs;
+  unsigned char didSend, didReceive;
+  struct timeval tv;
 
   struct sockaddr_in from;
   int fromlen;
@@ -78,7 +80,12 @@ int icmp_tunnel(int sock, int proxy, struct sockaddr_in *target, int tun_fd, int
     FD_SET (tun_fd, &fs);
     FD_SET (sock, &fs);
 
-    select (tun_fd>sock?tun_fd+1:sock+1, &fs, NULL, NULL, NULL);/* block until data's available in one direction or the other */
+    didSend = didReceive = 0;
+
+    tv.tv_sec = 0;
+    tv.tv_usec = 100;
+
+    select (tun_fd>sock?tun_fd+1:sock+1, &fs, NULL, NULL, &tv);/* block until data's available in one direction or the other */
 
     /* data available on tunnel device, need to transmit over icmp */
     if (FD_ISSET(tun_fd, &fs)) {
@@ -100,6 +107,7 @@ int icmp_tunnel(int sock, int proxy, struct sockaddr_in *target, int tun_fd, int
         perror ("sendto");
         return -1;
       }
+      didSend = 1;
     }
 
     /* data available on socket from icmp, need to pass along to tunnel device */
@@ -111,8 +119,28 @@ int icmp_tunnel(int sock, int proxy, struct sockaddr_in *target, int tun_fd, int
         tun_write(tun_fd, packet+sizeof(struct ip)+sizeof(struct icmp), num-sizeof(struct ip)-sizeof(struct icmp));
         /* make the destination be the source of the most recently received packet */
         memcpy(&(target->sin_addr.s_addr), &(from.sin_addr.s_addr), 4*sizeof(char));
+        didReceive = 1;
       }
     }    /* end of data available */
+
+    /*
+     * if we didn't send or receive anything, the select timed out
+     * so lets send an echo request poll to the server (helps with
+     * stateful firewalls)
+     */
+    if (!proxy && !didSend && !didReceive) {
+      icmp->type = 8;/*echo request*/
+      icmp->code = 0;
+      icmp->id = id;/*mark the packet so the other end knows we care about it*/
+      icmp->seq = 0;
+      icmp->cksum = 0;
+      icmp->cksum = in_cksum((unsigned short*)packet, len);
+      result = sendto(sock, (char*)packet, len, 0, (struct sockaddr*)target, sizeof (struct sockaddr_in));
+      if (result==-1) {
+        perror ("sendto");
+        return -1;
+      }
+    }
   }  /* end of while(1) */
 
   return 0;
