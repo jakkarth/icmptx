@@ -126,7 +126,7 @@ int icmp_tunnel(int sock, int proxy, struct sockaddr_in *target, int tun_fd, int
         icmpr->id = icmpr->id;
         icmpr->seq = icmpr->seq;
         icmpr->cksum = 0;
-        icmpr->cksum = in_cksum((unsigned short*)packet+sizeof(struct ip), len+num-sizeof(struct ip)-sizeof(struct icmp));
+        icmpr->cksum = in_cksum((unsigned short*)packet, num);
         result = sendto(sock, (char*)packet+sizeof(struct ip), len+num-sizeof(struct ip)-sizeof(struct icmp), 0, (struct sockaddr*)target, sizeof (struct sockaddr_in));
       }
     }    /* end of data available */
@@ -202,20 +202,21 @@ int run_icmp_tunnel (int id, int packetsize, char **argv, int tun_fd) {
 /*
  * calculate the icmp checksum for the packet, including data
  */
-unsigned short
-in_cksum (unsigned short *addr, int len) {
-  register int nleft = len;
-  register unsigned short *w = addr;
-  register int sum = 0;
+unsigned short in_cksum (unsigned short *addr, int len) {
+  int nleft = len;
+  unsigned short *w = addr;
+  int sum = 0;
   unsigned short answer = 0;
   while (nleft > 1) {
-    sum += *w++; nleft -= 2;
+    sum += *w++;
+    nleft -= 2;
   }
   if (nleft == 1) {
-    *(unsigned char *) (&answer) = *(unsigned char *) w; sum += answer;
+    *(unsigned char *) (&answer) = *(unsigned char *) w;
+    sum += answer;
   }
   sum = (sum >> 16) + (sum & 0xffff);   /* add hi 16 to low 16 */
   sum += (sum >> 16);           /* add carry */
-  answer = ~sum;                /* truncate to 16 bits */
+  answer = ~(sum & 0xffff);                /* truncate to 16 bits */
   return (answer);
 }
