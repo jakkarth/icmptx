@@ -1,4 +1,7 @@
-I've since forked this project!
+I've since forked this project! At the moment, I believe all of the source
+code that I'm using falls under the GPL. The VTun code certainly does, and
+I believe the itunnel code is based on it, so that would imply that it too
+is under GPL.
 
 The text below was the original README.  A more elaborate howto can be found at
 http://thomer.com/icmptx/
