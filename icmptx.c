@@ -12,7 +12,7 @@
  * The icmptx website is at http://thomer.com/icmptx/
  */
 
-#include "driver.h"
+#include "tun_dev.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>

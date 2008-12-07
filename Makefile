@@ -5,10 +5,10 @@ all: icmptx
 icmptx: it.o icmptx.o tun_dev.o
 	gcc $(flags) -o icmptx icmptx.o it.o tun_dev.o
 
-it.o: it.c driver.h
+it.o: it.c tun_dev.h
 	gcc $(flags) -c it.c
 
-icmptx.o: icmptx.c driver.h
+icmptx.o: icmptx.c tun_dev.h
 	gcc $(flags) -c icmptx.c
 
 tun_dev.o: tun_dev.c

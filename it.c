@@ -21,7 +21,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#include "driver.h"
+#include "tun_dev.h"
 
 /*
  * FIXME this seems really screwed up. This stuff is supposed to be in the files I'm including above.

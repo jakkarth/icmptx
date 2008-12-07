@@ -17,7 +17,7 @@
 */
 
 /*
- * driver.h,v 1.1.1.1.2.1 2000/11/20 07:57:33 maxk Exp
+ * tun_dev.h,v 1.1.1.1.2.1 2000/11/20 07:57:33 maxk Exp
  */ 
 #ifndef _DRIVER_H
 #define _DRIVER_H
@@ -27,34 +27,9 @@
  * version 3.0
  */
 
-extern int (*dev_write)(int fd, char *buf, int len);
-extern int (*dev_read)(int fd, char *buf, int len);
-
-extern int (*proto_write)(int fd, char *buf, int len);
-extern int (*proto_read)(int fd, char *buf);
-
 int tun_open(char *dev);
 int tun_close(int fd, char *dev);
 int tun_write(int fd, char *buf, int len);
 int tun_read(int fd, char *buf, int len);
-
-int tap_open(char *dev);
-int tap_close(int fd, char *dev);
-int tap_write(int fd, char *buf, int len);
-int tap_read(int fd, char *buf, int len);
-
-int pty_open(char *dev);
-int pty_write(int fd, char *buf, int len);
-int pty_read(int fd, char *buf, int len);
-
-int pipe_open(int *fd);
-int pipe_write(int fd, char *buf, int len);
-int pipe_read(int fd, char *buf, int len);
-
-int tcp_write(int fd, char *buf, int len);
-int tcp_read(int fd, char *buf);
-
-int udp_write(int fd, char *buf, int len);
-int udp_read(int fd, char *buf);
 
 #endif
