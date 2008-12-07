@@ -32,7 +32,7 @@ struct icmp {
 };
 
 struct ip {
-  unsigned int	ip_hl:4, /* both fields are 4 bits */
+  unsigned int	ip_hl:4,
     ip_v:4;			
   unsigned char	ip_tos;			
   unsigned short	ip_len;			
@@ -82,8 +82,8 @@ int icmp_tunnel(int sock, int proxy, struct sockaddr_in *target, int tun_fd, int
 
     didSend = didReceive = 0;
 
-    tv.tv_sec = 0;
-    tv.tv_usec = 100;
+    tv.tv_sec = 1;
+    tv.tv_usec = 0;
 
     select (tun_fd>sock?tun_fd+1:sock+1, &fs, NULL, NULL, &tv);/* block until data's available in one direction or the other */
 
@@ -115,11 +115,19 @@ int icmp_tunnel(int sock, int proxy, struct sockaddr_in *target, int tun_fd, int
       fromlen = sizeof (struct sockaddr_in);
       num = recvfrom(sock, packet, len+packetsize, 0, (struct sockaddr*)&from, (socklen_t*) &fromlen);
       /* the data packet */
+      memcpy(&(target->sin_addr.s_addr), &(from.sin_addr.s_addr), 4*sizeof(char));
       if (icmpr->id == id) {/*this filters out all of the other tunnel packets I don't care about*/
         tun_write(tun_fd, packet+sizeof(struct ip)+sizeof(struct icmp), num-sizeof(struct ip)-sizeof(struct icmp));
         /* make the destination be the source of the most recently received packet */
-        memcpy(&(target->sin_addr.s_addr), &(from.sin_addr.s_addr), 4*sizeof(char));
         didReceive = 1;
+      } else if (icmpr->type == 8) {/* some normal ping request */
+        icmpr->type = 0;/*echo request or echo response*/
+        icmpr->code = 0;
+        icmpr->id = icmpr->id;
+        icmpr->seq = icmpr->seq;
+        icmpr->cksum = 0;
+        icmpr->cksum = in_cksum((unsigned short*)packet+sizeof(struct ip), len+num-sizeof(struct ip)-sizeof(struct icmp));
+        result = sendto(sock, (char*)packet+sizeof(struct ip), len+num-sizeof(struct ip)-sizeof(struct icmp), 0, (struct sockaddr*)target, sizeof (struct sockaddr_in));
       }
     }    /* end of data available */
 
