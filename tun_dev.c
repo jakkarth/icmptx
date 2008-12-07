@@ -34,8 +34,6 @@
 #include <sys/socket.h>
 #include <linux/if.h>
 
-#include "vtun.h"
-
 int snprintf(char *str, size_t size, const char *format, ...);
 
 /* 
