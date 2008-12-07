@@ -14,7 +14,7 @@
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
- */
+*/
 
 /*
  * tun_dev.c,v 1.1.2.4 2001/09/13 05:02:22 maxk Exp
@@ -35,31 +35,32 @@
 #include <linux/if.h>
 
 #include "vtun.h"
-#include "lib.h"
+
+int snprintf(char *str, size_t size, const char *format, ...);
 
 /* 
  * Allocate TUN device, returns opened fd. 
  * Stores dev name in the first arg(must be large enough).
+ * FIXME how large is large enough??
  */  
-int tun_open_old(char *dev)
-{
-    char tunname[14];
-    int i, fd;
+int tun_open_old(char *dev) {
+  char tunname[14];
+  int i, fd;
 
-    if( *dev ) {
-       sprintf(tunname, "/dev/%s", dev);
-       return open(tunname, O_RDWR);
-    }
+  if(*dev) {
+    snprintf(tunname, sizeof(tunname), "/dev/%s", dev);
+    return open(tunname, O_RDWR);
+  }
 
-    for(i=0; i < 255; i++){
-       sprintf(tunname, "/dev/tun%d", i);
-       /* Open device */
-       if( (fd=open(tunname, O_RDWR)) > 0 ){
-          sprintf(dev, "tun%d", i);
-          return fd;
-       }
+  for(i=0; i < 255; i++){
+    sprintf(tunname, "/dev/tun%d", i);
+    /* Open device */
+    if( (fd=open(tunname, O_RDWR)) > 0 ){
+      sprintf(dev, "tun%d", i);
+      return fd;
     }
-    return -1;
+  }
+  return -1;
 }
 
 #include <linux/if_tun.h>
@@ -71,48 +72,51 @@ int tun_open_old(char *dev)
 #define OTUNSETPERSIST (('T'<< 8) | 203) 
 #define OTUNSETOWNER   (('T'<< 8) | 204)
 
-int tun_open(char *dev)
-{
-    struct ifreq ifr;
-    int fd;
+/*
+ *FIXME what is dev supposed to contain?
+ * current guess is /dev/tunX, and if it's null then I try to find one
+ */
+int tun_open(char *dev) {
+  struct ifreq ifr;
+  int fd;
 
-    if ((fd = open("/dev/net/tun", O_RDWR)) < 0)
-       return tun_open_old(dev);
+  if ((fd = open("/dev/net/tun", O_RDWR)) < 0) {
+    return tun_open_old(dev);
+  }
 
-    memset(&ifr, 0, sizeof(ifr));
-    ifr.ifr_flags = IFF_TUN | IFF_NO_PI;
-    if (*dev)
-       strncpy(ifr.ifr_name, dev, IFNAMSIZ);
+  memset(&ifr, 0, sizeof(ifr));
 
-    if (ioctl(fd, TUNSETIFF, (void *) &ifr) < 0) {
-       if (errno == EBADFD) {
-	  /* Try old ioctl */
- 	  if (ioctl(fd, OTUNSETIFF, (void *) &ifr) < 0) 
-	     goto failed;
-       } else
-          goto failed;
-    } 
+  ifr.ifr_flags = IFF_TUN | IFF_NO_PI;
+  if (*dev) {
+    strncpy(ifr.ifr_name, dev, IFNAMSIZ);
+  }
 
-    strcpy(dev, ifr.ifr_name);
-    return fd;
+  if (ioctl(fd, TUNSETIFF, (void *) &ifr) < 0) {
+    if (errno == EBADFD) {
+      /* Try old ioctl */
+      if (ioctl(fd, OTUNSETIFF, (void *) &ifr) < 0) 
+        goto failed;
+    } else
+      goto failed;
+  } 
 
-failed:
-    close(fd);
-    return -1;
+  strcpy(dev, ifr.ifr_name);
+  return fd;
+
+ failed:
+  close(fd);
+  return -1;
 }
 
-int tun_close(int fd, char *dev)
-{
-    return close(fd);
+int tun_close(int fd, char *dev) {
+  return close(fd);
 }
 
 /* Read/write frames from TUN device */
-int tun_write(int fd, char *buf, int len)
-{
-    return write(fd, buf, len);
+int tun_write(int fd, char *buf, int len) {
+  return write(fd, buf, len);
 }
 
-int tun_read(int fd, char *buf, int len)
-{
-    return read(fd, buf, len);
+int tun_read(int fd, char *buf, int len) {
+  return read(fd, buf, len);
 }

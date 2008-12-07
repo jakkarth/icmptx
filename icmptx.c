@@ -24,30 +24,31 @@ int run_icmp_tunnel (int id, int packetsize, char **argv, int tun_fd);
 const int mtu = 65536;
 
 int main(int argc, char **argv) {
-    char *dev;
-    int tun_fd = 0;
+  char *dev;
+  int tun_fd = 0;
 
-    /* create the tunnel device */
-    dev = (char *) malloc(16);
-    if (dev == NULL) {
-        printf( "If you have never had problems allocating 16 bytes\n"
-                "of memory, then now is your first time. Fatal.\n");
-        return 1;
-    }
-    dev[0] = 0;
-    tun_fd = tun_open(dev);
+  if (argc != 3) {
+    fprintf(stderr, "Error, incorrect number of arguments provided. -s for server mode and -c for client and destination host name?\n");
+    return 1;
+  }
 
-    if (tun_fd < 1) {
-        printf("Could not create tunnel device. Fatal.\n");
-        return 1;
-    }
-    else {
-        printf("Created tunnel device: %s\n", dev);
-    }
+  /* create the tunnel device */
+  if ((dev = (char *) malloc(16)) == NULL) {
+    fprintf(stderr, "If you have never had problems allocating 16 bytes\n"
+            "of memory, then now is your first time. Fatal.\n");
+    return 1;
+  }
+  dev[0] = 0;
+  if ((tun_fd = tun_open(dev)) < 1) {
+    fprintf(stderr, "Could not create tunnel device. Fatal.\n");
+    return 1;
+  } else {
+    printf("Created tunnel device: %s\n", dev);
+  }
 
-    run_icmp_tunnel(7530, mtu, argv, tun_fd);
+  run_icmp_tunnel(7530, mtu, argv, tun_fd);
 
-    tun_close(tun_fd, dev);
+  tun_close(tun_fd, dev);
 
-    return 0;
+  return 0;
 }

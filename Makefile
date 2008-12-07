@@ -5,13 +5,13 @@ all: icmptx
 icmptx: it.o icmptx.o tun_dev.o
 	gcc $(flags) -o icmptx icmptx.o it.o tun_dev.o
 
-it.o: it.c
+it.o: it.c driver.h
 	gcc $(flags) -c it.c
 
-icmptx.o: icmptx.c
+icmptx.o: icmptx.c driver.h
 	gcc $(flags) -c icmptx.c
 
-tun_dev.o: tun_dev.c
+tun_dev.o: tun_dev.c vtun.h llist.h
 	gcc $(flags) -c tun_dev.c
 
 clean:

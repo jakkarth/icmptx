@@ -1,4 +1,3 @@
-
 /*  
     VTun - Virtual Tunnel over TCP/IP network.
 
@@ -15,7 +14,7 @@
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
- */
+*/
 
 /*
  * llist.h,v 1.1.1.2 2000/03/28 17:19:30 maxk Exp
@@ -25,23 +24,14 @@
 #define _VTUN_LLIST_H
 
 struct llist_element {
-	struct llist_element * next;
-	void * data;
+  struct llist_element * next;
+  void * data;
 };
 typedef struct llist_element llist_elm;
 
 typedef struct {
-	llist_elm * head;
-	llist_elm * tail;
+  llist_elm * head;
+  llist_elm * tail;
 } llist;
-
-
-void llist_init(llist *l);
-int  llist_add(llist *l, void *d);
-int  llist_empty(llist *l);
-void * llist_trav(llist *l, int (*f)(void *d, void *u), void *u);
-int llist_copy(llist *l, llist *t, void* (*f)(void *d, void *u), void *u);
-void * llist_free(llist *l, int (*f)(void *d, void *u), void *u);
-
 
 #endif /* _VTUN_LLIST_H */

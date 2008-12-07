@@ -14,7 +14,7 @@
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
- */
+*/
 
 /*
  * vtun.h,v 1.7.2.6 2001/12/29 17:01:01 bergolth Exp
@@ -45,25 +45,25 @@
 /* End of configurable part */
 
 struct vtun_sopt {
-    char *dev;
-    char *laddr;
-    int  lport;
-    char *raddr;
-    int  rport;
+  char *dev;
+  char *laddr;
+  int  lport;
+  char *raddr;
+  int  rport;
 };
 
 struct vtun_stat {
-   unsigned long byte_in;
-   unsigned long byte_out;
-   unsigned long comp_in;
-   unsigned long comp_out;
-   FILE *file;
+  unsigned long byte_in;
+  unsigned long byte_out;
+  unsigned long comp_in;
+  unsigned long comp_out;
+  FILE *file;
 };
 
 struct vtun_cmd {
-   char *prog;
-   char *args;
-   int  flags;
+  char *prog;
+  char *args;
+  int  flags;
 };
 /* Command flags */
 #define VTUN_CMD_WAIT	0x01 
@@ -71,48 +71,48 @@ struct vtun_cmd {
 #define VTUN_CMD_SHELL  0x04
 
 struct vtun_addr {
-   char *name;
-   char *ip;
-   int port;
-   int type;
+  char *name;
+  char *ip;
+  int port;
+  int type;
 };
 /* Address types */
 #define VTUN_ADDR_IFACE	0x01 
 #define VTUN_ADDR_NAME  0x02
 
 struct vtun_host {
-   char *host;
-   char *passwd;
-   char *dev;
+  char *host;
+  char *passwd;
+  char *dev;
 
-   llist up;
-   llist down;
+  llist up;
+  llist down;
 
-   int  flags;
-   int  timeout;
-   int  spd_in;
-   int  spd_out;
-   int  zlevel;
+  int  flags;
+  int  timeout;
+  int  spd_in;
+  int  spd_out;
+  int  zlevel;
 
-   int  rmt_fd;
-   int  loc_fd;
+  int  rmt_fd;
+  int  loc_fd;
 
-   /* Persist mode */
-   int  persist;
+  /* Persist mode */
+  int  persist;
 
-   /* Multiple connections */
-   int  multi;
+  /* Multiple connections */
+  int  multi;
 
-   /* Keep Alive */
-   int ka_interval;
-   int ka_failure;
+  /* Keep Alive */
+  int ka_interval;
+  int ka_failure;
 
-   /* Source address */
-   struct vtun_addr src_addr;
+  /* Source address */
+  struct vtun_addr src_addr;
 
-   struct vtun_stat stat;
+  struct vtun_stat stat;
 
-   struct vtun_sopt sopt;
+  struct vtun_sopt sopt;
 };
 
 extern llist host_list;
@@ -168,22 +168,22 @@ extern llist host_list;
 
 /* Global options */
 struct vtun_opts {
-   int  timeout;
-   int  persist;
+  int  timeout;
+  int  persist;
 
-   char *cfg_file;
+  char *cfg_file;
 
-   char *shell; 	 /* Shell */
-   char *ppp;		 /* Command to configure ppp devices */
-   char *ifcfg;		 /* Command to configure net devices */
-   char *route;		 /* Command to configure routing */
-   char *fwall; 	 /* Command to configure FireWall */
-   char *iproute;	 /* iproute command */
+  char *shell; 	 /* Shell */
+  char *ppp;		 /* Command to configure ppp devices */
+  char *ifcfg;		 /* Command to configure net devices */
+  char *route;		 /* Command to configure routing */
+  char *fwall; 	 /* Command to configure FireWall */
+  char *iproute;	 /* iproute command */
 
-   char *svr_name;       /* Server's host name */
-   int  svr_port;	 /* Server's port */
-   int  svr_type;	 /* Server mode */
-   int  syslog; 	 /* Facility to log messages to syslog under */
+  char *svr_name;       /* Server's host name */
+  int  svr_port;	 /* Server's port */
+  int  svr_type;	 /* Server mode */
+  int  syslog; 	 /* Facility to log messages to syslog under */
 };
 #define VTUN_STAND_ALONE	0 
 #define VTUN_INETD		1	
