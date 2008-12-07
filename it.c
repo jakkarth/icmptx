@@ -109,7 +109,7 @@ int icmp_tunnel(int sock, int proxy, struct sockaddr_in *target, int tun_fd, int
       /* the data packet */
       if (icmpr->id == id) {/*this filters out all of the other tunnel packets I don't care about*/
         tun_write(tun_fd, packet+sizeof(struct ip)+sizeof(struct icmp), num-sizeof(struct ip)-sizeof(struct icmp));
-        /* one IPv4 client */
+        /* make the destination be the source of the most recently received packet */
         memcpy(&(target->sin_addr.s_addr), &(from.sin_addr.s_addr), 4*sizeof(char));
       }
     }    /* end of data available */

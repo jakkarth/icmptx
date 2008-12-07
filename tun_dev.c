@@ -39,7 +39,7 @@ int snprintf(char *str, size_t size, const char *format, ...);
 /* 
  * Allocate TUN device, returns opened fd. 
  * Stores dev name in the first arg(must be large enough).
- * FIXME how large is large enough??
+ * FIXME how large is large enough?? why if (*dev)?
  */  
 int tun_open_old(char *dev) {
   char tunname[14];
@@ -68,7 +68,7 @@ int tun_open_old(char *dev) {
 
 /*
  *FIXME what is dev supposed to contain?
- * current guess is /dev/tunX, and if it's null then I try to find one
+ * current guess is /dev/tunX, and if the first byte is null then I try to find one
  * when it comes back out, it's got the device /dev/whatever in it, so it had better be big enough, but I don't think we care about this?
  */
 int tun_open(char *dev) {
