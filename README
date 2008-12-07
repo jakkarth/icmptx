@@ -1,0 +1,34 @@
+The text below was the original README.  A more elaborate howto can be found at
+http://thomer.com/icmptx/
+
+
+------
+an icmp tunnel application based on itunnel and vtun.
+
+it.c		- modified itunnel part (pretty straightforward)
+tun_dev.c	- tun/tap part from vtun (copy)
+
+to run it, make sure you have tuntap in kernel (with 2.6, the driver is 'tun',
+not sure if it works with older kernels - i removed older driver support).
+
+create a tunnel on a server (to a dummy address) with:
+./create_tun dummy_address
+
+set the link up with ifconfig or iproute2 ip, set up routes and everything else
+as needed (set MTU!):
+ifconfig tun0 mtu 1400 192.168.3.1
+route add 192.168.3.2 tun0
+
+create tunnel from client:
+./create_tun server
+
+set the link up, routes as needed and so on:
+ifconfig tun0 mtu 1400 192.168.3.2
+route add 192.168.3.1 tun0
+route add default gw 192.168.3.1
+
+the MTU should be set to 1400 (it's defined in create_tun.c) or to anything
+that can be sent as a payload of a single ICMP packet (changing create_tun.c
+accordingly).
+
+Enjoy.
