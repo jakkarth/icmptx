@@ -64,15 +64,12 @@ int tun_open_old(char *dev) {
 #include <linux/if_tun.h>
 
 /* pre 2.4.6 compatibility */
-#define OTUNSETNOCSUM  (('T'<< 8) | 200) 
-#define OTUNSETDEBUG   (('T'<< 8) | 201) 
 #define OTUNSETIFF     (('T'<< 8) | 202) 
-#define OTUNSETPERSIST (('T'<< 8) | 203) 
-#define OTUNSETOWNER   (('T'<< 8) | 204)
 
 /*
  *FIXME what is dev supposed to contain?
  * current guess is /dev/tunX, and if it's null then I try to find one
+ * when it comes back out, it's got the device /dev/whatever in it, so it had better be big enough, but I don't think we care about this?
  */
 int tun_open(char *dev) {
   struct ifreq ifr;

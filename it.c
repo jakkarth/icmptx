@@ -78,12 +78,12 @@ int icmp_tunnel(int sock, int proxy, struct sockaddr_in *target, int tun_fd, int
     FD_SET (tun_fd, &fs);
     FD_SET (sock, &fs);
 
-    select (tun_fd>sock?tun_fd+1:sock+1, &fs, NULL, NULL, NULL);
+    select (tun_fd>sock?tun_fd+1:sock+1, &fs, NULL, NULL, NULL);/* block until data's available in one direction or the other */
 
     /* data available on tunnel device, need to transmit over icmp */
-    if (FD_ISSET (tun_fd, &fs)) {
-      result = tun_read (tun_fd, packet+len, packetsize);
-      if (!result) {
+    if (FD_ISSET(tun_fd, &fs)) {
+      result = tun_read(tun_fd, packet+len, packetsize);
+      if (!result) {/*eof*/
         return 0;
       } else if (result==-1) {
         perror("read");
