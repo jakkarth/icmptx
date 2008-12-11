@@ -1,6 +1,6 @@
 This is the ICMPTX program.
 
-This software is most recently available from FIXME
+This software is most recently available from http://github.com/jakkarth/icmptx
 
 ICMPTX is a program that allows a user with root privledges to create a
 virtual network link between two computers, encapsulating data inside of
@@ -70,4 +70,4 @@ possibly still available at http://www.linuxexposed.com/content/view/153/52/ .
 That seems to be where Thomer Gil found it, after which he further cleaned
 it up and presented it at http://thomer.com/icmptx/, which is where I,
 John Plaxco, came across it. Further and newer information may be
-available at the project's homepage at FIXME.
+available at the project's homepage at http://github.com/jakkarth/icmptx.

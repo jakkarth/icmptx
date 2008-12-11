@@ -16,7 +16,7 @@
     Code updated by John Plaxco, cleaned up and added polling support to survive stateful firewalls.
  
     The (old) icmptx website is at http://thomer.com/icmptx/
-    The current icmptx website is hosted at github, FIXME
+    The current icmptx website is hosted at github, http://github.com/jakkarth/icmptx
 */
 
 #include "tun_dev.h"
