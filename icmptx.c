@@ -1,54 +1,57 @@
-/* Code is ruthlessly ripped from vtun and itunnel with appropriate changes.
- * Guys, thanks for the great stuff!
- *
- * itunnel - an ICMP tunnel by edi / teso
- * VTun - Virtual Tunnel over TCP/IP network.
- *
- * Original author unknown, but modified by Thomer M. Gil who found the original
- * code through
- *   http://www.linuxexposed.com/Articles/Hacking/Case-of-a-wireless-hack.html
- * (a page written by Siim Põder).
- *
- * The icmptx website is at http://thomer.com/icmptx/
- */
+/*
+    This file is part of ICMPTX
+
+    itunnel - an ICMP tunnel by edi / teso
+    VTun - Virtual Tunnel over TCP/IP network.
+
+    Copyright (C) 1998-2000  Maxim Krasnyansky <max_mk@yahoo.com>
+    Copyright (C) 2006       Thomer M. Gil <thomer@thomer.com>
+    Copyright (C) 2008       John Plaxco <john@johnplaxco.com>
+ 
+    Original author unknown, but modified by Thomer M. Gil who found the original
+    code through
+      http://www.linuxexposed.com/Articles/Hacking/Case-of-a-wireless-hack.html
+      (a page written by Siim Põder).
+
+    Code updated by John Plaxco, cleaned up and added polling support to survive stateful firewalls.
+ 
+    The (old) icmptx website is at http://thomer.com/icmptx/
+    The current icmptx website is hosted at github, FIXME
+*/
 
 #include "tun_dev.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-/* modified itunnel */
-int run_icmp_tunnel (int id, int packetsize, char **argv, int tun_fd);
+int run_icmp_tunnel (int id, int packetsize, int isServer, char *serverNameOrIP, int tun_fd);
 
-/* max transfered unit - capsuled packet size */
+/* size of the largest icmp data payload to send, NOT MTU of tun device */
 const int mtu = 65536;
 
+#define USAGE "Usage: %s [-s|-c] server\n       -s Server Mode\n       -c Client Mode\n   server The host name or IP address of the server\n"
+
 int main(int argc, char **argv) {
-  char *dev;
   int tun_fd = 0;
 
   if (argc != 3) {
-    fprintf(stderr, "Error, incorrect number of arguments provided. -s for server mode and -c for client and destination host name?\n");
+    fprintf(stderr, USAGE, argv[0]);
+    return 1;
+  }
+  if (strcmp(argv[1],"-c") && strcmp(argv[1],"-s")) {
+    fprintf(stderr, USAGE, argv[0]);
     return 1;
   }
 
-  /* create the tunnel device */
-  if ((dev = (char *) malloc(16)) == NULL) {
-    fprintf(stderr, "If you have never had problems allocating 16 bytes\n"
-            "of memory, then now is your first time. Fatal.\n");
-    return 1;
-  }
-  dev[0] = 0;
-  if ((tun_fd = tun_open(dev)) < 1) {
+  if ((tun_fd = tun_open()) < 1) {
     fprintf(stderr, "Could not create tunnel device. Fatal.\n");
     return 1;
-  } else {
-    printf("Created tunnel device: %s\n", dev);
   }
 
-  run_icmp_tunnel(7530, mtu, argv, tun_fd);
+  run_icmp_tunnel(7537, mtu, !strcmp(argv[1],"-s"), argv[2], tun_fd);
 
-  tun_close(tun_fd, dev);
+  /* when run_icmp_tunnel returns, we must be finished */
+  tun_close(tun_fd);
 
   return 0;
 }
